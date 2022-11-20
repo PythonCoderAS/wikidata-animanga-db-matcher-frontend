@@ -1,0 +1,11 @@
+.itemLabelInput {
+  padding-right: 10px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.mainPart > *:not(:first-child):not(:last-child) {
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 15px;
+}
