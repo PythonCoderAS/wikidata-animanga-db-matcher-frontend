@@ -100,12 +100,12 @@ export default function providerResults(props: ProviderResultsProps) {
       {
         field: "notices",
         headerName: "Extra",
-        width: 150,
+        flex: 1,
         renderCell(params) {
           return (
-            <Stack spacing={1}>
-              {existingIDs.has(params.row.id) && <Chip color="success" label="Already Exists" />}
-              {params.row.data.nsfw && <Chip color="error" label="NSFW" />}
+            <Stack spacing={1} direction="row">
+              {existingIDs.has(params.row.id) && <Chip color="success" label="Already Exists" size="small" />}
+              {params.row.data.nsfw && <Chip color="error" label="NSFW" size="small" />}
             </Stack>
           );
         },
