@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-shadow -- Bogus error with enums
 export enum ItemType {
-  anime,
-  manga,
+  anime = "Anime",
+  manga = "Manga",
 }
 
 export const InstanceMapping: Map<ItemType, string[]> = new Map([
@@ -38,16 +38,40 @@ export const InstanceMapping: Map<ItemType, string[]> = new Map([
 
 export const instanceOfProperty = "P31";
 
-export enum MangaProviders {
-  myanimelist = "P4087",
-  anilist = "P8731",
-  mangadex = "P10589",
-  mangaupdates = "P11149",
+export interface Provider {
+  property: number;
+  title: string;
+  id: string;
+  // A URL with a placeholder "$1" for the ID.
+  format: string;
 }
 
-export const mangaProviderIDs: Map<MangaProviders, string> = new Map([
-  [MangaProviders.myanimelist, "manga-myanimelist"],
-  [MangaProviders.anilist, "manga-anilist"],
-  [MangaProviders.mangadex, "manga-mangadex"],
-  [MangaProviders.mangaupdates, "manga-mangaupdates"],
+export const ProviderData: Map<ItemType, Provider[]> = new Map();
+ProviderData.set(ItemType.anime, []);
+
+ProviderData.set(ItemType.manga, [
+  {
+    property: 4087,
+    title: "MyAnimeList",
+    id: "manga-myanimelist",
+    format: "https://myanimelist.net/manga/$1",
+  },
+  {
+    property: 8731,
+    title: "AniList",
+    id: "manga-anilist",
+    format: "https://anilist.co/manga/$1",
+  },
+  {
+    property: 10589,
+    title: "MangaDex",
+    id: "manga-mangadex",
+    format: "https://mangadex.org/title/$1",
+  },
+  {
+    property: 11149,
+    title: "MangaUpdates",
+    id: "manga-mangaupdates",
+    format: "https://www.mangaupdates.com/series/$1",
+  },
 ]);

@@ -5,7 +5,9 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 
 import Header from "../../common/header";
-import ItemDataComponent from "./components/itemData";
+import { hashTitles } from "../../common/utils";
+import DatabaseResults from "./components/databaseResults";
+import ItemDataComponent, { Result1 } from "./components/itemData";
 import onSubmit, { ItemData } from "./components/itemData/onsubmit";
 import mainStyles from "./index.module.css";
 
@@ -16,6 +18,7 @@ export default function Main() {
   const [spin, updateSpin] = useState(false);
   const [itemGetError, updateItemGetError] = useState("");
   const [itemData, updateItemData] = useState<ItemData | null>(null);
+  const [result1, updateResult1] = useState<Result1 | null>(null);
   return (
     <div className={mainStyles.mainPart}>
       <Header />
@@ -69,16 +72,30 @@ export default function Main() {
           Fetch Item Info
         </LoadingButton>
       </form>
-      <div
-        style={itemGetError || itemData ? {} : { display: "none" }}
-        id="result-1"
-      >
-        {itemGetError ? (
-          <Alert severity="error">{itemGetError}</Alert>
-        ) : itemData ? (
-          <ItemDataComponent itemData={itemData!} />
-        ) : undefined}
-      </div>
+      {itemGetError || itemData ? (
+        <div id="result-1">
+          {itemGetError ? (
+            <Alert severity="error">{itemGetError}</Alert>
+          ) : itemData ? (
+            <ItemDataComponent
+              itemData={itemData!}
+              setResult1={updateResult1}
+            />
+          ) : undefined}
+        </div>
+      ) : undefined}
+      {result1 != null ? (
+        <div id="result-2">
+          {[...result1.databases].map((database) => (
+            <DatabaseResults
+              itemData={itemData!}
+              titles={result1.titles}
+              type={database}
+              key={`${database}-${hashTitles(result1.titles)}`}
+            />
+          ))}
+        </div>
+      ) : undefined}
     </div>
   );
 }

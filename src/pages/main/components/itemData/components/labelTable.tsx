@@ -1,6 +1,11 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
-import { ItemDataProps } from "..";
+import { ItemData } from "../onsubmit";
+
+export interface LabelTableProps {
+  itemData: ItemData;
+  setTitles(titles: Set<string>): unknown;
+}
 
 interface Row {
   lang: string;
@@ -8,7 +13,7 @@ interface Row {
   name: string;
 }
 
-export default function labelTable(props: ItemDataProps) {
+export default function labelTable(props: LabelTableProps) {
   const columns: GridColDef<Row>[] = [
     {
       field: "lang",
@@ -48,6 +53,16 @@ export default function labelTable(props: ItemDataProps) {
         sorting: { sortModel: [{ field: "lang", sort: "asc" }] },
       }}
       getRowId={(row) => `${row.lang}-${row.type}-${row.name}`}
+      onSelectionModelChange={(rows) =>
+        props.setTitles(
+          new Set(
+            rows.map(
+              (row) =>
+                row.toString().match(/^([a-z]{2,})\-(Label|Alias)-(.+)$/)![3]
+            )
+          )
+        )
+      }
     />
   );
 }

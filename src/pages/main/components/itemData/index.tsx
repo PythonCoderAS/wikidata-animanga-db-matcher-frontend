@@ -1,4 +1,6 @@
 import { ClaimSnakEntityValue } from "@entitree/helper";
+import SearchIcon from "@mui/icons-material/Search";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 
@@ -11,8 +13,14 @@ import ItemTypeChoices from "./components/itemTypeChoices";
 import LabelTable from "./components/labelTable";
 import { ItemData } from "./onsubmit";
 
+export interface Result1 {
+  titles: Set<string>;
+  databases: Set<ItemType>;
+}
+
 export interface ItemDataProps {
   itemData: ItemData;
+  setResult1(result: Result1 | null): unknown;
 }
 
 export function determineItemType(itemData: ItemData): Set<ItemType> {
@@ -37,11 +45,29 @@ export default function ItemDataComponent(props: ItemDataProps) {
   const [itemType, setItemType] = useState<Set<ItemType>>(
     determineItemType(props.itemData)
   );
+  const [titles, setTitles] = useState<Set<string>>(new Set());
   return (
     <div>
       <Typography variant="h5">{props.itemData.id}</Typography>
       <ItemTypeChoices itemType={itemType} setItemType={setItemType} />
-      <LabelTable itemData={props.itemData} />
+      <LabelTable itemData={props.itemData} setTitles={setTitles} />
+      <form
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          console.log("Submitted...");
+          props.setResult1(null);
+          props.setResult1({ titles, databases: itemType });
+        }}
+      >
+        <Button
+          variant="contained"
+          endIcon={<SearchIcon />}
+          type="submit"
+          sx={{ marginTop: "15px" }}
+        >
+          Get From Databases
+        </Button>
+      </form>
     </div>
   );
 }
