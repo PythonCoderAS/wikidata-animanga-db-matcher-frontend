@@ -54,8 +54,6 @@ export default function ItemDataComponent(props: ItemDataProps) {
       <form
         onSubmit={(ev) => {
           ev.preventDefault();
-          console.log("Submitted...");
-          props.setResult1(null);
           props.setResult1({ titles, databases: itemType });
         }}
       >

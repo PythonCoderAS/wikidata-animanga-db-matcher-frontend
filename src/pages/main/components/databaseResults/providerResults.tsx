@@ -1,6 +1,6 @@
 import { Claim } from "@entitree/helper";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { Alert, CircularProgress, Link } from "@mui/material";
+import { Alert, Chip, CircularProgress, Link, Stack } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
@@ -16,13 +16,19 @@ export interface ProviderResultsProps {
   titles: Set<string>;
 }
 
-export type MatchedIDs = Record<string, string>;
+export interface ResultItem {
+  title: string;
+  nsfw?: boolean;
+  urlOverride?: string;
+}
+
+export type MatchedIDs = Record<string, ResultItem>;
 
 export interface Row {
   id: string;
-  title: string;
+  title?: JSX.Element;
+  data: ResultItem;
   link?: typeof Link;
-  existing?: JSX.Element;
 }
 
 export default function providerResults(props: ProviderResultsProps) {
@@ -73,14 +79,16 @@ export default function providerResults(props: ProviderResultsProps) {
         flex: 1,
         sortable: true,
       },
-      { field: "title", headerName: "Name", flex: 1, sortable: true },
+      { field: "title", headerName: "Name", flex: 1, sortable: true, valueGetter(params) {
+        return params.row.data.title;
+      }, },
       {
         field: "link",
         headerName: "Link",
         renderCell(params) {
           return (
             <Link
-              href={props.provider.format.replace("$1", params.row.id)}
+              href={params.row.data.urlOverride ?? props.provider.format.replace("$1", params.row.id)}
               target="_blank"
               underline="hover"
             >
@@ -90,25 +98,22 @@ export default function providerResults(props: ProviderResultsProps) {
         },
       },
       {
-        field: "existing",
-        headerName: "Already Exists",
+        field: "notices",
+        headerName: "Extra",
         width: 150,
         renderCell(params) {
           return (
-            <span
-              style={{
-                color: existingIDs.has(params.row.id) ? "green" : "red",
-              }}
-            >
-              {existingIDs.has(params.row.id) ? "Yes" : "No"}
-            </span>
+            <Stack spacing={1}>
+              {existingIDs.has(params.row.id) && <Chip color="success" label="Already Exists" />}
+              {params.row.data.nsfw && <Chip color="error" label="NSFW" />}
+            </Stack>
           );
         },
       },
     ];
-    const rows: Row[] = Object.entries(results!).map(([id, title]) => ({
+    const rows: Row[] = Object.entries(results!).map(([id, data]) => ({
       id,
-      title,
+      data
     }));
     return (
       <DataGrid
