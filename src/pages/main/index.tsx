@@ -4,6 +4,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useRef, useState } from "react";
 
@@ -126,11 +127,18 @@ export default function Main() {
             ))}
           </div>
           <div>
+            <Stack spacing={1}>
+            {!loggedIn ? (
+              <Alert severity="warning">Please log in to make edits to Wikidata.</Alert>
+            ) : Object.values(newPropValues).length === 0 ? (
+              <Alert severity="warning">Please select some new values to make edits. Selecting an already existing value will not result in any edits.</Alert>
+            ) : (
+              <Alert severity="info">Please review the edits before submitting.</Alert>
+            )}
             <LoadingButton
               loading={editSpin}
               endIcon={<EditIcon />}
               variant="contained"
-              sx={{ marginTop: "15px" }}
               disabled={Object.values(newPropValues).length === 0 || !loggedIn}
               onClick={async () => {
                 if (Object.values(newPropValues).length > 0) {
@@ -194,6 +202,7 @@ export default function Main() {
             >
               Set New Values
             </LoadingButton>
+            </Stack>
           </div>
         </>
       ) : undefined}
