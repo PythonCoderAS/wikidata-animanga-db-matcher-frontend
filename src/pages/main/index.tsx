@@ -5,10 +5,10 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import Header from "../../common/header";
-import { hashTitles } from "../../common/utils";
+import { hashTitles, resetAllOnChange, resetOnChange } from "../../common/utils";
 import { Operation, Operations, doOp } from "../../common/wikidata";
 import DatabaseResults from "./components/databaseResults";
 import ItemDataComponent, { Result1 } from "./components/itemData";
@@ -27,6 +27,8 @@ export default function Main() {
     {}
   );
   const [editSpin, updateEditSpin] = useState(false);
+  resetAllOnChange<ItemData | null, any>(itemData, [updateResult1, null], [updateNewPropValues, {}], [updateEditSpin, false]);
+  resetAllOnChange<Result1 | null, any>(result1, [updateNewPropValues, {}], [updateEditSpin, false])
   const loggedIn = sessionStorage.getItem("username") !== null;
   const setNewPropValues = (property: number, value: string | null) => {
     const propString = `P${property}`;
