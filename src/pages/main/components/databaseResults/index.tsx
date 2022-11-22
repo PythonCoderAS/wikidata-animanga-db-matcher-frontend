@@ -9,6 +9,7 @@ export interface DatabaseResultsProps {
   titles: Set<string>;
   type: ItemType;
   itemData: ItemData;
+  setNewPropValues: (property: number, value: string | null) => unknown;
 }
 
 export default function databaseResults(props: DatabaseResultsProps) {
@@ -22,6 +23,7 @@ export default function databaseResults(props: DatabaseResultsProps) {
             provider={provider}
             titles={props.titles}
             existingData={props.itemData.claims![`P${provider.property}`]}
+            setNewPropValues={props.setNewPropValues}
           />
         </div>
       ))}

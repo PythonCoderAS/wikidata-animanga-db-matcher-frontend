@@ -1,0 +1,5 @@
+{
+  "clientId": "5a788e454725fc5b8fe3dd2fefbd316d",
+  "redirectUrl": "http://localhost:16000/oauth/callback",
+  "origin": "http://localhost:16000"
+}

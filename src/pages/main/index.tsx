@@ -1,11 +1,15 @@
+import { getWikidataEntities } from "@entitree/helper";
+import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
 
 import Header from "../../common/header";
 import { hashTitles } from "../../common/utils";
+import { Operation, Operations, doOp } from "../../common/wikidata";
 import DatabaseResults from "./components/databaseResults";
 import ItemDataComponent, { Result1 } from "./components/itemData";
 import onSubmit, { ItemData } from "./components/itemData/onsubmit";
@@ -19,6 +23,28 @@ export default function Main() {
   const [itemGetError, updateItemGetError] = useState("");
   const [itemData, updateItemData] = useState<ItemData | null>(null);
   const [result1, updateResult1] = useState<Result1 | null>(null);
+  const [newPropValues, updateNewPropValues] = useState<Record<string, string>>(
+    {}
+  );
+  const [editSpin, updateEditSpin] = useState(false);
+  const loggedIn = sessionStorage.getItem("username") !== null;
+  const setNewPropValues = (property: number, value: string | null) => {
+    const propString = `P${property}`;
+    if (value === null) {
+      delete newPropValues[propString];
+    } else {
+      if (
+        (itemData?.claims![propString] ?? [])
+          .map((claim) => claim.mainsnak.datavalue!.value as unknown as string)
+          .includes(value)
+      ) {
+        delete newPropValues[propString];
+      } else {
+        newPropValues[propString] = value;
+      }
+    }
+    updateNewPropValues({ ...newPropValues });
+  };
   return (
     <div className={mainStyles.mainPart}>
       <Header />
@@ -85,16 +111,89 @@ export default function Main() {
         </div>
       ) : undefined}
       {result1 != null ? (
-        <div id="result-2">
-          {[...result1.databases].map((database) => (
-            <DatabaseResults
-              itemData={itemData!}
-              titles={result1.titles}
-              type={database}
-              key={`${database}-${hashTitles(result1.titles)}`}
-            />
-          ))}
-        </div>
+        <>
+          <div id="result-2">
+            {[...result1.databases].map((database) => (
+              <DatabaseResults
+                itemData={itemData!}
+                titles={result1.titles}
+                type={database}
+                key={`${database}-${hashTitles(result1.titles)}`}
+                setNewPropValues={setNewPropValues}
+              />
+            ))}
+          </div>
+          <div>
+            <LoadingButton
+              loading={editSpin}
+              endIcon={<EditIcon />}
+              variant="contained"
+              sx={{ marginTop: "15px" }}
+              disabled={Object.values(newPropValues).length === 0 || !loggedIn}
+              onClick={async () => {
+                if (Object.values(newPropValues).length > 0) {
+                  updateEditSpin(true);
+                  const opData: Operations[] = [];
+                  for (const [prop, value] of Object.entries(newPropValues)) {
+                    if (itemData?.claims![prop] === undefined) {
+                      opData.push({
+                        type: Operation.createClaim,
+                        itemId: itemData!.id,
+                        data: {
+                          property: prop,
+                          value,
+                        },
+                      });
+                    } else {
+                      const existing = itemData!.claims![prop];
+                      if (existing.length === 1) {
+                        opData.push({
+                          type: Operation.setClaim,
+                          itemId: itemData!.id,
+                          data: {
+                            id: existing[0].id,
+                            newValue: value,
+                          },
+                        });
+                      } else {
+                        opData.push({
+                          type: Operation.setClaim,
+                          itemId: itemData!.id,
+                          data: {
+                            id: existing[0].id,
+                            newValue: value,
+                          },
+                        });
+                        for (let i = 1; i < existing.length; i++) {
+                          opData.push({
+                            type: Operation.deleteClaim,
+                            itemId: itemData!.id,
+                            data: {
+                              id: existing[i].id,
+                            },
+                          });
+                        }
+                      }
+                    }
+                  }
+                  for (const op of opData) {
+                    await doOp(op);
+                  }
+                  const newData = await getWikidataEntities(
+                    [itemData!.id],
+                    [],
+                    ["labels", "aliases", "claims"]
+                  );
+                  updateItemData(newData[itemData!.id]);
+                  updateNewPropValues({});
+                  updateEditSpin(false);
+                }
+              }}
+            >
+              Set New Values
+            </LoadingButton>
+          </div>
+        </>
       ) : undefined}
     </div>
   );

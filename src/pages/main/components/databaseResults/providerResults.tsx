@@ -11,9 +11,10 @@ import { useState } from "react";
 import { Provider } from "../../../../common/constants";
 
 export interface ProviderResultsProps {
-  existingData: Claim[];
+  existingData?: Claim[];
   provider: Provider;
   titles: Set<string>;
+  setNewPropValues: (property: number, value: string | null) => unknown;
 }
 
 export interface ResultItem {
@@ -36,39 +37,46 @@ export default function providerResults(props: ProviderResultsProps) {
   const [results, updateResults] = useState<MatchedIDs | null>(null);
   const [error, updateError] = useState<string | null>(null);
   if (results === null && error === null) {
-    navigator.locks.request(props.provider.id, async () => {
-      if (!(results === null && error === null)) {
-        return null;
-      }
-      await fetch(`/api/getResults`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          provider: props.provider.id,
-          titles: [...props.titles],
-        }),
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            throw new Error(`HTTP ${res.status} while fetching results.`);
-          }
+    navigator.locks.request(
+      props.provider.id,
+      { ifAvailable: true },
+      async (lock) => {
+        if (!lock) {
+          return;
+        }
+        if (!(results === null && error === null)) {
+          return null;
+        }
+        await fetch(`/api/getResults`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            provider: props.provider.id,
+            titles: [...props.titles],
+          }),
         })
-        .then((json) => updateResults(json))
-        .catch((err) => {
-          updateError(err);
-        });
-    });
+          .then((res) => {
+            if (res.ok) {
+              return res.json();
+            } else {
+              throw new Error(`HTTP ${res.status} while fetching results.`);
+            }
+          })
+          .then((json) => updateResults(json))
+          .catch((err) => {
+            updateError(err);
+          });
+      }
+    );
     return <CircularProgress />;
   } else if (error !== null) {
     return <Alert severity="error">{error.toString()}</Alert>;
   } else {
     // Workaround needed until https://github.com/codeledge/entitree-monorepo/pull/25 is merged.
     const existingIDs: Set<string> = new Set(
-      props.existingData.map(
+      (props.existingData ?? []).map(
         (val) => val.mainsnak.datavalue!.value as unknown as string
       )
     );
@@ -79,16 +87,25 @@ export default function providerResults(props: ProviderResultsProps) {
         flex: 1,
         sortable: true,
       },
-      { field: "title", headerName: "Name", flex: 1, sortable: true, valueGetter(params) {
-        return params.row.data.title;
-      }, },
+      {
+        field: "title",
+        headerName: "Name",
+        flex: 1,
+        sortable: true,
+        valueGetter(params) {
+          return params.row.data.title;
+        },
+      },
       {
         field: "link",
         headerName: "Link",
         renderCell(params) {
           return (
             <Link
-              href={params.row.data.urlOverride ?? props.provider.format.replace("$1", params.row.id)}
+              href={
+                params.row.data.urlOverride ??
+                props.provider.format.replace("$1", params.row.id)
+              }
               target="_blank"
               underline="hover"
             >
@@ -104,8 +121,12 @@ export default function providerResults(props: ProviderResultsProps) {
         renderCell(params) {
           return (
             <Stack spacing={1} direction="row">
-              {existingIDs.has(params.row.id) && <Chip color="success" label="Already Exists" size="small" />}
-              {params.row.data.nsfw && <Chip color="error" label="NSFW" size="small" />}
+              {existingIDs.has(params.row.id) && (
+                <Chip color="success" label="Already Exists" size="small" />
+              )}
+              {params.row.data.nsfw && (
+                <Chip color="error" label="NSFW" size="small" />
+              )}
             </Stack>
           );
         },
@@ -113,14 +134,20 @@ export default function providerResults(props: ProviderResultsProps) {
     ];
     const rows: Row[] = Object.entries(results!).map(([id, data]) => ({
       id,
-      data
+      data,
     }));
     return (
       <DataGrid
         rows={rows}
         columns={cols}
         autoHeight
-        onSelectionModelChange={(rows) => console.log(rows)}
+        onSelectionModelChange={(rows) => {
+          if (rows.length === 0) {
+            props.setNewPropValues(props.provider.property, null);
+          } else {
+            props.setNewPropValues(props.provider.property, rows[0].toString());
+          }
+        }}
       />
     );
   }
