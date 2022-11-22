@@ -28,8 +28,6 @@ export default function Main() {
     {}
   );
   const [editSpin, updateEditSpin] = useState(false);
-  resetAllOnChange<ItemData | null, any>(itemData, [updateResult1, null], [updateNewPropValues, {}], [updateEditSpin, false]);
-  resetAllOnChange<Result1 | null, any>(result1, [updateNewPropValues, {}], [updateEditSpin, false])
   const loggedIn = sessionStorage.getItem("username") !== null;
   const setNewPropValues = (property: number, value: string | null) => {
     const propString = `P${property}`;
