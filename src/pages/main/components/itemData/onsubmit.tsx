@@ -14,11 +14,18 @@ export interface ItemDataState {
   updateItemData: (val: ItemData) => unknown;
 }
 
+interface ResetOtherState {
+  updateResult1: (val: null) => unknown;
+  updateNewPropValues: (val: Record<string, string>) => unknown;
+  updateEditSpin: (val: boolean) => unknown;
+}
+
 export default function onSubmit(
   event: FormEvent<HTMLFormElement>,
   itemVal: string,
   error: ErrorState,
-  itemData: ItemDataState
+  itemData: ItemDataState,
+  reset: ResetOtherState
 ) {
   console.log(itemVal);
   event.preventDefault();
@@ -42,7 +49,12 @@ export default function onSubmit(
         }
       })
       .catch((err) => itemData.updateItemGetError(err))
-      .finally(() => itemData.updateSpin(false));
+      .finally(() => {
+        itemData.updateSpin(false);
+        reset.updateResult1(null);
+        reset.updateNewPropValues({});
+        reset.updateEditSpin(false);
+      });
   }
   return;
 }

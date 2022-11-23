@@ -19,16 +19,23 @@ export function hashTitles(titles: Set<string>): string {
   return ret;
 }
 
-export function resetOnChange<CheckVal, ResetVal>(value_to_check_for: CheckVal, function_to_reset: (val: ResetVal) => unknown, value_to_reset_to: ResetVal){
+export function resetOnChange<CheckVal, ResetVal>(
+  value_to_check_for: CheckVal,
+  function_to_reset: (val: ResetVal) => unknown,
+  value_to_reset_to: ResetVal
+) {
   return useEffect(() => {
     function_to_reset(value_to_reset_to);
-  }, [value_to_check_for])
+  }, [value_to_check_for]);
 }
 
-export function resetAllOnChange<CheckVal, ResetVal>(value_to_check_for: CheckVal, ...resets: [((val: ResetVal) => unknown), ResetVal][]){
+export function resetAllOnChange<CheckVal, ResetVal>(
+  value_to_check_for: CheckVal,
+  ...resets: [(val: ResetVal) => unknown, ResetVal][]
+) {
   return useEffect(() => {
     for (const [reset, value] of resets) {
       reset(value);
     }
-  }, [value_to_check_for])
+  }, [value_to_check_for]);
 }

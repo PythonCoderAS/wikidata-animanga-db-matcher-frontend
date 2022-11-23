@@ -9,7 +9,11 @@ import TextField from "@mui/material/TextField";
 import { useRef, useState } from "react";
 
 import Header from "../../common/header";
-import { hashTitles, resetAllOnChange, resetOnChange } from "../../common/utils";
+import {
+  hashTitles,
+  resetAllOnChange,
+  resetOnChange,
+} from "../../common/utils";
 import { Operation, Operations, doOp } from "../../common/wikidata";
 import DatabaseResults from "./components/databaseResults";
 import ItemDataComponent, { Result1 } from "./components/itemData";
@@ -55,7 +59,8 @@ export default function Main() {
             ev,
             itemVal,
             { updateError, updateErrorText },
-            { updateSpin, updateItemGetError, updateItemData }
+            { updateSpin, updateItemGetError, updateItemData },
+            { updateResult1, updateNewPropValues, updateEditSpin }
           )
         }
         noValidate={true}
@@ -107,6 +112,8 @@ export default function Main() {
             <ItemDataComponent
               itemData={itemData!}
               setResult1={updateResult1}
+              updateEditSpin={updateEditSpin}
+              updateNewPropValues={updateNewPropValues}
             />
           ) : undefined}
         </div>
@@ -126,80 +133,89 @@ export default function Main() {
           </div>
           <div>
             <Stack spacing={1}>
-            {!loggedIn ? (
-              <Alert severity="warning">Please log in to make edits to Wikidata.</Alert>
-            ) : Object.values(newPropValues).length === 0 ? (
-              <Alert severity="warning">Please select some new values to make edits. Selecting an already existing value will not result in any edits.</Alert>
-            ) : (
-              <Alert severity="info">Please review the edits before submitting.</Alert>
-            )}
-            <LoadingButton
-              loading={editSpin}
-              endIcon={<EditIcon />}
-              variant="contained"
-              disabled={Object.values(newPropValues).length === 0 || !loggedIn}
-              onClick={async () => {
-                if (Object.values(newPropValues).length > 0) {
-                  updateEditSpin(true);
-                  const opData: Operations[] = [];
-                  for (const [prop, value] of Object.entries(newPropValues)) {
-                    if (itemData?.claims![prop] === undefined) {
-                      opData.push({
-                        type: Operation.createClaim,
-                        itemId: itemData!.id,
-                        data: {
-                          property: prop,
-                          value,
-                        },
-                      });
-                    } else {
-                      const existing = itemData!.claims![prop];
-                      if (existing.length === 1) {
+              {!loggedIn ? (
+                <Alert severity="warning">
+                  Please log in to make edits to Wikidata.
+                </Alert>
+              ) : Object.values(newPropValues).length === 0 ? (
+                <Alert severity="warning">
+                  Please select some new values to make edits. Selecting an
+                  already existing value will not result in any edits.
+                </Alert>
+              ) : (
+                <Alert severity="info">
+                  Please review the edits before submitting.
+                </Alert>
+              )}
+              <LoadingButton
+                loading={editSpin}
+                endIcon={<EditIcon />}
+                variant="contained"
+                disabled={
+                  Object.values(newPropValues).length === 0 || !loggedIn
+                }
+                onClick={async () => {
+                  if (Object.values(newPropValues).length > 0) {
+                    updateEditSpin(true);
+                    const opData: Operations[] = [];
+                    for (const [prop, value] of Object.entries(newPropValues)) {
+                      if (itemData?.claims![prop] === undefined) {
                         opData.push({
-                          type: Operation.setClaim,
+                          type: Operation.createClaim,
                           itemId: itemData!.id,
                           data: {
-                            id: existing[0].id,
-                            newValue: value,
+                            property: prop,
+                            value,
                           },
                         });
                       } else {
-                        opData.push({
-                          type: Operation.setClaim,
-                          itemId: itemData!.id,
-                          data: {
-                            id: existing[0].id,
-                            newValue: value,
-                          },
-                        });
-                        for (let i = 1; i < existing.length; i++) {
+                        const existing = itemData!.claims![prop];
+                        if (existing.length === 1) {
                           opData.push({
-                            type: Operation.deleteClaim,
+                            type: Operation.setClaim,
                             itemId: itemData!.id,
                             data: {
-                              id: existing[i].id,
+                              id: existing[0].id,
+                              newValue: value,
                             },
                           });
+                        } else {
+                          opData.push({
+                            type: Operation.setClaim,
+                            itemId: itemData!.id,
+                            data: {
+                              id: existing[0].id,
+                              newValue: value,
+                            },
+                          });
+                          for (let i = 1; i < existing.length; i++) {
+                            opData.push({
+                              type: Operation.deleteClaim,
+                              itemId: itemData!.id,
+                              data: {
+                                id: existing[i].id,
+                              },
+                            });
+                          }
                         }
                       }
                     }
+                    for (const op of opData) {
+                      await doOp(op);
+                    }
+                    const newData = await getWikidataEntities(
+                      [itemData!.id],
+                      [],
+                      ["labels", "aliases", "claims"]
+                    );
+                    updateItemData(newData[itemData!.id]);
+                    updateNewPropValues({});
+                    updateEditSpin(false);
                   }
-                  for (const op of opData) {
-                    await doOp(op);
-                  }
-                  const newData = await getWikidataEntities(
-                    [itemData!.id],
-                    [],
-                    ["labels", "aliases", "claims"]
-                  );
-                  updateItemData(newData[itemData!.id]);
-                  updateNewPropValues({});
-                  updateEditSpin(false);
-                }
-              }}
-            >
-              Set New Values
-            </LoadingButton>
+                }}
+              >
+                Set New Values
+              </LoadingButton>
             </Stack>
           </div>
         </>

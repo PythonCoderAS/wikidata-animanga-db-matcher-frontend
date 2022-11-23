@@ -21,6 +21,8 @@ export interface Result1 {
 export interface ItemDataProps {
   itemData: ItemData;
   setResult1(result: Result1 | null): unknown;
+  updateNewPropValues(newPropValues: Record<string, string>): unknown;
+  updateEditSpin(editSpin: boolean): unknown;
 }
 
 export function determineItemType(itemData: ItemData): Set<ItemType> {
@@ -55,6 +57,8 @@ export default function ItemDataComponent(props: ItemDataProps) {
         onSubmit={(ev) => {
           ev.preventDefault();
           props.setResult1({ titles, databases: itemType });
+          props.updateNewPropValues({});
+          props.updateEditSpin(false);
         }}
       >
         <Button
