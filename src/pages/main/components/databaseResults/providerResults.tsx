@@ -140,6 +140,7 @@ export default function providerResults(props: ProviderResultsProps) {
       <DataGrid
         rows={rows}
         columns={cols}
+        pageSize={10}
         autoHeight
         onSelectionModelChange={(rows) => {
           if (rows.length === 0) {

@@ -4,6 +4,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useRef, useState } from "react";
@@ -32,6 +33,8 @@ export default function Main() {
     {}
   );
   const [editSpin, updateEditSpin] = useState(false);
+  const [editProgress, updateEditProgress] = useState(0);
+  const [editBuffer, updateEditBuffer] = useState(0);
   const loggedIn = sessionStorage.getItem("username") !== null;
   const setNewPropValues = (property: number, value: string | null) => {
     const propString = `P${property}`;
@@ -147,6 +150,13 @@ export default function Main() {
                   Please review the edits before submitting.
                 </Alert>
               )}
+              {editSpin && (
+                <LinearProgress
+                  variant="buffer"
+                  value={editProgress}
+                  valueBuffer={editBuffer}
+                />
+              )}
               <LoadingButton
                 loading={editSpin}
                 endIcon={<EditIcon />}
@@ -200,8 +210,10 @@ export default function Main() {
                         }
                       }
                     }
-                    for (const op of opData) {
-                      await doOp(op);
+                    for (let i = 0; i < opData.length; i++) {
+                      updateEditProgress((i / opData.length) * 100);
+                      updateEditBuffer(((i + 1) / opData.length) * 100);
+                      await doOp(opData[i]);
                     }
                     const newData = await getWikidataEntities(
                       [itemData!.id],
@@ -211,6 +223,8 @@ export default function Main() {
                     updateItemData(newData[itemData!.id]);
                     updateNewPropValues({});
                     updateEditSpin(false);
+                    updateEditProgress(0);
+                    updateEditBuffer(0);
                   }
                 }}
               >
