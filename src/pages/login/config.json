@@ -1,5 +1,5 @@
 {
-  "clientId": "5a788e454725fc5b8fe3dd2fefbd316d",
-  "redirectUrl": "http://localhost:16000/oauth/callback",
-  "origin": "http://localhost:16000"
+  "clientId": "dab8c983b8275404ac3cf8b85e45ca47",
+  "redirectUrl": "https://animanga-db-matcher.toolforge.org/oauth/callback",
+  "origin": "https://animanga-db-matcher.toolforge.org"
 }
