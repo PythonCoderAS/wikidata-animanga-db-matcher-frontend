@@ -59,7 +59,7 @@ export default function labelTable(props: LabelTableProps) {
           new Set(
             selectedRows.map(
               (row) =>
-                row.toString().match(/^([a-z]{2,})_(Label|Alias)_(.+)$/)![3]
+                row.toString().match(/^([a-z-]{2,})_(Label|Alias)_(.+)$/)![3]
             )
           )
         )
