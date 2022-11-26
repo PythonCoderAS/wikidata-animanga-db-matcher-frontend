@@ -37,6 +37,7 @@ export default function labelTable(props: LabelTableProps) {
   for (const [lang, label] of Object.entries(props.itemData.labels ?? {})) {
     rows.push({ type: "Label", lang, name: label.value });
   }
+
   for (const [lang, aliases] of Object.entries(props.itemData.aliases ?? {})) {
     for (const alias of aliases) {
       rows.push({ type: "Alias", lang, name: alias.value });
@@ -52,13 +53,13 @@ export default function labelTable(props: LabelTableProps) {
       initialState={{
         sorting: { sortModel: [{ field: "lang", sort: "asc" }] },
       }}
-      getRowId={(row) => `${row.lang}-${row.type}-${row.name}`}
-      onSelectionModelChange={(rows) =>
+      getRowId={(row) => `${row.lang}_${row.type}_${row.name}`}
+      onSelectionModelChange={(selectedRows) =>
         props.setTitles(
           new Set(
-            rows.map(
+            selectedRows.map(
               (row) =>
-                row.toString().match(/^([a-z]{2,})\-(Label|Alias)-(.+)$/)![3]
+                row.toString().match(/^([a-z]{2,})_(Label|Alias)_(.+)$/)![3]
             )
           )
         )
