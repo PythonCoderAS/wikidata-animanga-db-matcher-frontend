@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-shadow -- Bogus error with enums
 export enum ItemType {
   anime = "Anime",
   manga = "Manga",

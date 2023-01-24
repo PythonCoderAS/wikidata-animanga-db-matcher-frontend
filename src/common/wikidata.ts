@@ -53,6 +53,7 @@ async function doAPIRequest(
     doPost = true;
     extraHeaders["Content-Type"] =
       "application/x-www-form-urlencoded; charset=utf-8";
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     token = await getCSRFToken();
   }
 

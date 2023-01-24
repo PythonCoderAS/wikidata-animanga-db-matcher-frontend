@@ -1,3 +1,7 @@
 {
-  "extends": ["pythoncoderas-combo"]
+  "extends": ["pythoncoderas-combo"],
+  "rules": {
+    "camelcase": "off",
+    "no-shadow": "off"
+  }
 }
