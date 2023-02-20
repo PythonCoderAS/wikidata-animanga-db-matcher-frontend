@@ -20,7 +20,7 @@
     "@mui/material": "^5.11.9",
     "@mui/x-data-grid": "^5.17.24",
     "autoprefixer": "^10.4.13",
-    "lru-cache": "^7.16.0",
+    "lru-cache": "^7.16.1",
     "postcss": "^8.4.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
