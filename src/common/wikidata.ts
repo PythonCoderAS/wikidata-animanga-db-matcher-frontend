@@ -40,6 +40,7 @@ export type DeleteClaimOp = ClaimOp<
 >;
 
 export const wikidataAPIEndpoint = "https://www.wikidata.org/w/api.php";
+export const wikidataProxyAPIEndpoint = "./wikidata/w/api.php";
 
 async function doAPIRequest(
   params: Record<string, string>,
@@ -49,7 +50,9 @@ async function doAPIRequest(
   const extraHeaders: Record<string, string> = {};
   let token: string | null = null;
   let doPost = post;
+  let endpoint = wikidataAPIEndpoint;
   if (addToken) {
+    endpoint = wikidataProxyAPIEndpoint;
     doPost = true;
     extraHeaders["Content-Type"] =
       "application/x-www-form-urlencoded; charset=utf-8";
@@ -58,7 +61,7 @@ async function doAPIRequest(
   }
 
   const resp = await doAuthenticatedRequest(
-    `${wikidataAPIEndpoint}?${new URLSearchParams({
+    `${endpoint}?${new URLSearchParams({
       ...params,
       origin: config.origin,
     }).toString()}`,
