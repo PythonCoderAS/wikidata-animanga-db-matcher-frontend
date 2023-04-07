@@ -51,7 +51,7 @@ async function doAPIRequest(
   params: Record<string, string>,
   options: APIRequestOptions
 ) {
-  const extraHeaders: Record<string, string> = {};
+  const extraHeaders: Record<string, string> = {"Origin": config.origin};
   let token: string | null = null;
   let doPost = options.post;
   let endpoint = wikidataAPIEndpoint;
