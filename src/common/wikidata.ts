@@ -41,18 +41,24 @@ export type DeleteClaimOp = ClaimOp<
 
 export const wikidataAPIEndpoint = "https://www.wikidata.org/w/api.php";
 export const wikidataProxyAPIEndpoint = "./wikidata/w/api.php";
+export interface APIRequestOptions {
+  post?: boolean;
+  addToken?: boolean;
+  useProxy?: boolean;
+}
 
 async function doAPIRequest(
   params: Record<string, string>,
-  post = false,
-  addToken = false
+  options: APIRequestOptions
 ) {
   const extraHeaders: Record<string, string> = {};
   let token: string | null = null;
-  let doPost = post;
+  let doPost = options.post;
   let endpoint = wikidataAPIEndpoint;
-  if (addToken) {
+  if (options.addToken || options.useProxy) {
     endpoint = wikidataProxyAPIEndpoint;
+  }
+  if (options.addToken) {
     doPost = true;
     extraHeaders["Content-Type"] =
       "application/x-www-form-urlencoded; charset=utf-8";
@@ -82,7 +88,7 @@ export async function getCSRFToken(): Promise<string> {
     meta: "tokens",
     formatversion: "2",
   };
-  return (await doAPIRequest(params)).query.tokens.csrftoken;
+  return (await doAPIRequest(params, {useProxy: true})).query.tokens.csrftoken;
 }
 
 export async function doCreateClaim(data: CreateClaimOp): Promise<string> {
@@ -96,7 +102,7 @@ export async function doCreateClaim(data: CreateClaimOp): Promise<string> {
     summary: `Set value of [[Property:${data.data.property}]] via user selection (Animanga DB Matcher)`,
     formatversion: "2",
   };
-  return (await doAPIRequest(params, true, true)).claim.id;
+  return (await doAPIRequest(params, {addToken: true})).claim.id;
 }
 
 export async function doSetClaim(data: SetClaimOp): Promise<string> {
@@ -109,7 +115,7 @@ export async function doSetClaim(data: SetClaimOp): Promise<string> {
     summary: "Updating value via user selection (Animanga DB Matcher)",
     formatversion: "2",
   };
-  return (await doAPIRequest(params, true, true)).claim.id;
+  return (await doAPIRequest(params, {addToken: true})).claim.id;
 }
 
 export async function doDeleteClaim(data: DeleteClaimOp): Promise<string> {
@@ -121,7 +127,7 @@ export async function doDeleteClaim(data: DeleteClaimOp): Promise<string> {
       "Deleting value due to multiple values for properties with single value only (Animanga DB Matcher)",
     formatversion: "2",
   };
-  await doAPIRequest(params, true, true);
+  await doAPIRequest(params, {addToken: true});
   return data.data.id;
 }
 

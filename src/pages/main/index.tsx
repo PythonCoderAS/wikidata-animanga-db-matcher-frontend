@@ -3,17 +3,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import Header from "../../common/header";
 import {
   hashTitles,
-  resetAllOnChange,
-  resetOnChange,
 } from "../../common/utils";
 import { Operation, Operations, doOp } from "../../common/wikidata";
 import DatabaseResults from "./components/databaseResults";
