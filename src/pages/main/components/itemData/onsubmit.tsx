@@ -45,7 +45,7 @@ export default function onSubmit(
         if (item[`Q${itemNum}`] === undefined) {
           itemData.updateItemGetError("Item not found.");
         } else {
-          itemData.updateItemData(item[`Q${itemNum}`]);
+          itemData.updateItemData(item[`Q${itemNum}`] as WikibaseEntity);
         }
       })
       .catch((err) => itemData.updateItemGetError(err))

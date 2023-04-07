@@ -1,4 +1,4 @@
-import { getWikidataEntities } from "@entitree/helper";
+import { WikibaseEntity, getWikidataEntities } from "@entitree/helper";
 import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -220,7 +220,7 @@ export default function Main() {
                       [],
                       ["labels", "aliases", "claims"]
                     );
-                    updateItemData(newData[itemData!.id]);
+                    updateItemData(newData[itemData!.id] as WikibaseEntity);
                     updateNewPropValues({});
                     updateEditSpin(false);
                     updateEditProgress(0);
