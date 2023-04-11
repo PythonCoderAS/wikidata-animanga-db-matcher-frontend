@@ -18,7 +18,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.125",
     "@mui/material": "^5.11.16",
-    "@mui/x-data-grid": "^6.0.4",
+    "@mui/x-data-grid": "^6.1.0",
     "autoprefixer": "^10.4.14",
     "lru-cache": "^9.0.1",
     "postcss": "^8.4.21",
