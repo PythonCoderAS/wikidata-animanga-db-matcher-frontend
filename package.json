@@ -16,7 +16,7 @@
     "@entitree/helper": "^0.8.0",
     "@fontsource/roboto": "^5.0.3",
     "@mui/icons-material": "^5.11.16",
-    "@mui/lab": "^5.0.0-alpha.133",
+    "@mui/lab": "^5.0.0-alpha.134",
     "@mui/material": "^5.13.5",
     "@mui/x-data-grid": "^6.7.0",
     "autoprefixer": "^10.4.14",
