@@ -15,7 +15,7 @@
     "@emotion/styled": "^11.11.0",
     "@entitree/helper": "^0.8.0",
     "@fontsource/roboto": "^5.0.5",
-    "@mui/icons-material": "^5.14.1",
+    "@mui/icons-material": "^5.14.3",
     "@mui/lab": "^5.0.0-alpha.138",
     "@mui/material": "^5.14.3",
     "@mui/x-data-grid": "^6.10.2",
