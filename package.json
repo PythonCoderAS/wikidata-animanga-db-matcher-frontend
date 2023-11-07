@@ -17,7 +17,7 @@
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.14.16",
     "@mui/lab": "^5.0.0-alpha.151",
-    "@mui/material": "^5.14.16",
+    "@mui/material": "^5.14.17",
     "@mui/x-data-grid": "^6.18.0",
     "autoprefixer": "^10.4.16",
     "lru-cache": "^10.0.1",
